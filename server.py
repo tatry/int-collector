@@ -2,6 +2,8 @@
 
 import socket
 
+import parser
+
 UDP_port = 9500
 UDP_IP = '0.0.0.0'
 
@@ -16,12 +18,12 @@ try:
 		
 		try:
 			# decode packet and send to DB
-			pass
-		except:
-			pass
+			parser.parse_int_report(data)
+		except Exception as e:
+			print("Received invalid packet: {}".format(e))
 
 except KeyboardInterrupt:
-	print("")
+	print("Interrupt")
 
 finally:
 	sock.close()
