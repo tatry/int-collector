@@ -126,8 +126,14 @@ def parse_int_report(data):
 			offset = offset + 4
 		else:
 			metadata[0] = None
+		
+		# TODO: other metadata
 
 		hops_metadata.append(metadata)
 	
 	return hops_metadata, srcIP, dstIP, srcPort, dstPort
 
+def parse_int_report_fast_latency_one_hop(data):
+	int_shim_header, int_header, int_metadata, ip_header, transport_header = split_int_report(data)
+
+	return get_int_dword(int_metadata, 8)

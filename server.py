@@ -2,12 +2,13 @@
 
 import socket
 import multiprocessing as mp
+import queue
 import signal
 import sys
 import os
 import time
 
-#import parser
+import parser
 
 class ServerState:
 	def __init__(self):
@@ -45,21 +46,30 @@ def server(result):
 	sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 	#sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 	sock.bind((UDP_IP, UDP_port))
-	print("Worker: {}".format(os.getpid()))
+
+	result.put_nowait((os.getpid(), True))
 
 	try:
 		while not state.timeToFinish:
 			data, addr = sock.recvfrom(1500)
-			print('received {} bytes from {}'.format(len(data), addr))
-			print("{} recv: ".format(os.getpid()), data)
+			#print('received {} bytes from {}'.format(len(data), addr))
+			#print("{} recv: ".format(os.getpid()), data)
 			
 			try:
 				# decode packet and send to DB
 				#parser.parse_int_report(data)
+				latency = parser.parse_int_report_fast_latency_one_hop(data)
+				state.totalDelay += latency
+				if latency < state.minDelay:
+					state.minDelay = latency
+				if latency > state.maxDelay:
+					state.maxDelay = latency
 				state.pkts += 1
-				#time.sleep(20)
+				print(latency)
+
 			except Exception as e:
-				print("Received invalid packet: {}".format(e))
+				pass
+				#print("Received invalid packet: {}".format(e))
 
 	except KeyboardInterrupt:
 		pass
@@ -67,7 +77,7 @@ def server(result):
 	finally:
 		sock.close()
 	
-	result.put(state)
+	result.put_nowait(state)
 
 if __name__ == '__main__':
 	max_processes = len(os.sched_getaffinity(0))
@@ -81,6 +91,14 @@ if __name__ == '__main__':
 		processes.append(p)
 		results.append(queue)
 	
+	for q, p in zip(results, processes):
+		try:
+			start = q.get(timeout=5)
+			print("Worker {} started...".format(start[0]))
+		except mp.queues.Empty:
+			print("Worker {} not started in the given time".format(p.pid))
+			# TODO: remove process and queue from list
+
 	try:
 		print("Started...")
 		signal.pause()
