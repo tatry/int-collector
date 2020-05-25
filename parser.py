@@ -1,4 +1,4 @@
-#!/bin/env python3
+#!/usr/bin/env python3
 
 import struct
 import socket
@@ -76,7 +76,7 @@ def split_int_report(data):
 	offset += header_size
 
 	# Metadata
-	header_size = 4 * (get_header_data(int_shim_header, 3, 1)[0] - 3)
+	header_size = 4 * (get_header_data(int_shim_header, 2, 1)[0] - 3)
 	if header_size < 0:
 		raise Exception('Invalid INT length')
 	int_metadata = get_header_data(data, offset, header_size)

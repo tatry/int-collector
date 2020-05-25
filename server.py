@@ -1,4 +1,4 @@
-#!/bin/env python3
+#!/usr/bin/env python3
 
 import socket
 import multiprocessing as mp
@@ -65,7 +65,6 @@ def server(result):
 				if latency > state.maxDelay:
 					state.maxDelay = latency
 				state.pkts += 1
-				print(latency)
 
 			except Exception as e:
 				pass
