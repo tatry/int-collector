@@ -141,7 +141,7 @@ def parse_int_report_fast_latency_one_hop(data):
 def parse_int_report_fast_latency_two_hop(data):
 	int_shim_header, int_header, int_metadata, ip_header, transport_header = split_int_report(data)
 
-	hop_ml = get_int_per_hop_metadata_size(int_header)
+	hop_ml = 4 * get_int_per_hop_metadata_size(int_header)
 	h1 = get_int_dword(int_metadata, 8)
 	h2 = get_int_dword(int_metadata, hop_ml + 8)
 
