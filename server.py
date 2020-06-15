@@ -58,7 +58,8 @@ def server(result):
 			try:
 				# decode packet and send to DB
 				#parser.parse_int_report(data)
-				latency = parser.parse_int_report_fast_latency_one_hop(data)
+				#latency = parser.parse_int_report_fast_latency_one_hop(data)
+				latency = parser.parse_int_report_fast_latency_two_hop(data)
 				state.totalDelay += latency
 				if latency < state.minDelay:
 					state.minDelay = latency
